@@ -21,9 +21,10 @@ jobs:
     runs-on: [self-hosted, linux]
     
     container:
-      image: ghcr.io/meta-flutter/ubuntu-20-dev:main
+      image: ghcr.io/meta-flutter/meta-flutter/ubuntu-20-dev:main
       options:
-        --user 1018
+        --user 1001
+        --privileged
         --storage-opt overlay.mount_program=/usr/bin/fuse-overlayfs
         --storage-opt overlay.mountopt=nodev,metacopy=on,noxattrs=1
         -v /mnt/raid10/github-ci/download:/home/dev/dl:Z
@@ -35,12 +36,17 @@ jobs:
       - name: Display UID Info
         run: |
           whoami
-          id -u
-          
-      - name: Set Ownership
-        run: |
-          chown -R dev:dev $HOME .
-          
+          id
+          cat /proc/self/uid_map
+          cat /etc/passwd
+          cd /home/dev
+          ls -la .
+          mkdir test && cd test
+          touch test && cd ..
+          ls -laR test
+          rm -rf test
+          ls -laR /__w/_temp/
+
       - uses: actions/checkout@v3
         with:
           path: ''
